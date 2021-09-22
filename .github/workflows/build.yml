@@ -1,0 +1,290 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  maven-central:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        type: [ modular, non-modular ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 16
+      - name: Find staging url
+        id: staging
+        run: |
+          STAGING_URL=`cat settings.properties | grep staging_url | cut -d'=' -f2`
+          MAVEN_VERSION=`cat settings.properties | grep maven_version | cut -d'=' -f2`
+          echo ::set-output name=staging_url::$STAGING_URL
+          echo ::set-output name=maven_version::$MAVEN_VERSION
+        shell: bash
+      - name: Test Maven (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
+          export DISPLAY=:90
+          mkdir /home/runner/.vnc
+          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
+          chmod -v 600 /home/runner/.vnc/passwd
+          vncserver :90 -localhost -nolisten tcp
+          mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+          vncserver -kill :90
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+      - name: Test Maven (Mac)
+        if: runner.os == 'macOS'
+        run: |
+          mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+      - name: Test Maven (Windows)
+        if: runner.os == 'windows'
+        run: |
+          mvn -q versions:set-property -Dproperty="staging.repo.url" -DnewVersion="${{ env.staging_url }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
+          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+      - name: Test Gradle (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          export DISPLAY=:90
+          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
+          chmod -v 600 /home/runner/.vnc/passwd
+          vncserver :90 -localhost -nolisten tcp
+          cd ${{ matrix.type }}/gradle/hellofx
+          chmod +x gradlew
+          ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
+          vncserver -kill :90
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+      - name: Test Gradle (Mac)
+        if: runner.os == 'macOS'
+        run: |
+          cd ${{ matrix.type }}/gradle/hellofx
+          chmod +x gradlew
+          ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+      - name: Test Gradle (Windows)
+        if: runner.os == 'windows'
+        run: |
+          cd ${{ matrix.type }}/gradle/hellofx
+          .\gradlew run -Pstaging="${{ env.staging_url }}" -Pjavafx_version="${{ env.maven_version }}"
+        env:
+          staging_url: ${{ steps.staging.outputs.staging_url }}
+          maven_version: ${{ steps.staging.outputs.maven_version }}
+  sdk:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        type: [ modular, non-modular ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 16
+      - name: Find SDK version
+        id: sdk
+        run: |
+          SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
+          echo ::set-output name=sdk_version::$SDK_VERSION
+        shell: bash
+      - name: Find Platform
+        id: platform
+        run: |
+          OS=${{ matrix.os }}
+          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+          if [[ "$OS" == "macos-latest" ]]; then
+            echo ::set-output name=platform::osx
+          elif [[ "$OS" == "windows-latest" ]]; then
+            echo ::set-output name=platform::windows
+            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+          else
+            echo ::set-output name=platform::linux
+          fi
+          echo ::set-output name=javafx::$SDK
+        shell: bash
+      - name: Setup JavaFX
+        if: runner.os != 'Windows'
+        run: |
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ env.sdk_version }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
+          unzip /tmp/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip -d /tmp
+        env:
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+          platform: ${{ steps.platform.outputs.platform }}
+      - name: Setup JavaFX (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ env.sdk_version }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
+          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
+        env:
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+      - name: Test Gradle (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
+          export DISPLAY=:90
+          mkdir /home/runner/.vnc
+          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
+          chmod -v 600 /home/runner/.vnc/passwd
+          vncserver :90 -localhost -nolisten tcp
+          cd ${{ matrix.type }}/gradle/hellofx
+          chmod +x gradlew
+          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }}
+          vncserver -kill :90
+        env:
+          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+      - name: Test Gradle (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd ${{ matrix.type }}/gradle/hellofx
+          chmod +x gradlew
+          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }}
+        env:
+          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+      - name: Test Gradle (Windows)
+        if: runner.os == 'windows'
+        run: |
+          cd ${{ matrix.type }}/gradle/hellofx
+          .\gradlew run -Psdk="${{ env.JAVAFX_HOME }}"
+        env:
+          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+  jmod:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 16
+      - name: Find JMOD version
+        id: jmod
+        run: |
+          JMOD_VERSION=`cat settings.properties | grep jmod_version | cut -d'=' -f2`
+          echo ::set-output name=jmod_version::$JMOD_VERSION
+        shell: bash
+      - name: Find Platform
+        id: platform
+        run: |
+          OS=${{ matrix.os }}
+          JMOD_HOME=${{ runner.temp }}/javafx-jmods-${{ steps.jmod.outputs.jmod_version }}
+          RUNTIME=target/runtime
+          JAVA_RUNTIME=$RUNTIME/bin/java
+          if [[ "$OS" == "macos-latest" ]]; then
+            echo ::set-output name=platform::osx
+          elif [[ "$OS" == "windows-latest" ]]; then
+            echo ::set-output name=platform::windows
+            JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_version }}
+            RUNTIME=target\\runtime
+            JAVA_RUNTIME=$RUNTIME\\bin\\java
+          else
+            echo ::set-output name=platform::linux
+          fi
+          echo ::set-output name=jmod_home::$JMOD_HOME
+          echo ::set-output name=runtime::$RUNTIME
+          echo ::set-output name=java_runtime::$JAVA_RUNTIME
+        shell: bash
+      - name: Setup JavaFX
+        if: runner.os != 'Windows'
+        run: |
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ env.jmod_version }}/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip
+          unzip /tmp/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip -d ${{ runner.temp }}
+        env:
+          jmod_version: ${{ steps.jmod.outputs.jmod_version }}
+          platform: ${{ steps.platform.outputs.platform }}
+      - name: Setup JavaFX (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ env.jmod_version }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
+          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip D:\
+        env:
+          jmod_version: ${{ steps.jmod.outputs.jmod_version }}
+      - name: Test JMODS (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd modular/maven/hellofx
+          javac --module-path ${{ env.JMOD_HOME }} -d mods $(find src -name "*.java")
+          cp -r src/main/resources/* mods
+          ${{ env.JAVA_HOME }}/bin/jlink \
+          --module-path ${{ env.JMOD_HOME }}:mods \
+          --add-modules javafx.fxml,javafx.controls,hellofx \
+          --output ${{ env.RUNTIME }} \
+          --strip-debug --compress 2 --no-header-files --no-man-pages
+          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+        env:
+          RUNTIME: ${{ steps.platform.outputs.runtime }}
+          JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
+          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
+
+      - name: Test JMODS (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd modular\maven\hellofx
+          $SOURCES = Get-ChildItem -Name -Filter *.java -Recurse $pwd
+          javac --module-path "${{ env.JMOD_HOME }}" -d mods $SOURCES
+          Copy-Item -Force -Path "src\main\resources\*" -Destination "mods" -Recurse
+          ${{ env.JAVA_HOME }}\bin\jlink `
+          --module-path "${{ env.JMOD_HOME }};mods" `
+          --add-modules javafx.fxml,javafx.controls,hellofx `
+          --output ${{ env.RUNTIME }} `
+          --strip-debug --compress 2 --no-header-files --no-man-pages
+          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+        env:
+          RUNTIME: ${{ steps.platform.outputs.runtime }}
+          JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
+          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}   
+
+      - name: Test JMODS (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cd modular/maven/hellofx
+          javac --module-path ${{ env.JMOD_HOME }} -d mods $(find src -name "*.java")
+          cp -r src/main/resources/* mods
+          ${{ env.JAVA_HOME }}/bin/jlink \
+          --module-path ${{ env.JMOD_HOME }}:mods \
+          --add-modules javafx.fxml,javafx.controls,hellofx \
+          --output ${{ env.RUNTIME }} \
+          --strip-debug --compress 2 --no-header-files --no-man-pages
+          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
+          export DISPLAY=:90
+          mkdir /home/runner/.vnc
+          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
+          chmod -v 600 /home/runner/.vnc/passwd
+          vncserver :90 -localhost -nolisten tcp
+          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+          vncserver -kill :90
+        env:
+          RUNTIME: ${{ steps.platform.outputs.runtime }}
+          JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
+          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}

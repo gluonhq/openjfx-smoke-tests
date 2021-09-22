@@ -1,0 +1,22 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+repositories {
+    maven {
+        url = project.hasProperty('staging') ? project.property('staging') : ''
+    }
+    mavenCentral()
+}
+
+javafx {
+    if (project.hasProperty('sdk')) {
+        sdk = project.property('sdk')
+    } else {
+        version = project.hasProperty('javafx_version') ? project.property('javafx_version') : '17'
+    }
+    modules = [ 'javafx.controls' ]
+}
+
+mainClassName = 'org.openjfx.Launcher'
