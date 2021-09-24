@@ -114,17 +114,22 @@ jobs:
         run: |
           SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
           echo ::set-output name=sdk_version::$SDK_VERSION
+          VERSIONPATH=$SDK_VERSION
+          if [[ "$VERSIONPATH" == *"ea"* ]]; then
+             VERSIONPATH=`echo $VERSIONPATH | cut -d'-' -f 1`
+          fi
+          echo ::set-output name=sdk_versionpath::$VERSIONPATH
         shell: bash
       - name: Find Platform
         id: platform
         run: |
           OS=${{ matrix.os }}
-          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           if [[ "$OS" == "macos-latest" ]]; then
             echo ::set-output name=platform::osx
           elif [[ "$OS" == "windows-latest" ]]; then
             echo ::set-output name=platform::windows
-            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           else
             echo ::set-output name=platform::linux
           fi
@@ -133,7 +138,7 @@ jobs:
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ env.sdk_version }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
           unzip /tmp/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip -d /tmp
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
@@ -141,7 +146,7 @@ jobs:
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ env.sdk_version }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
+          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
           Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
@@ -193,19 +198,24 @@ jobs:
         run: |
           JMOD_VERSION=`cat settings.properties | grep jmod_version | cut -d'=' -f2`
           echo ::set-output name=jmod_version::$JMOD_VERSION
+          VERSIONPATH=$JMOD_VERSION
+          if [[ "$VERSIONPATH" == *"ea"* ]]; then
+             VERSIONPATH=`echo $VERSIONPATH | cut -d'-' -f 1`
+          fi
+          echo ::set-output name=jmod_versionpath::$VERSIONPATH
         shell: bash
       - name: Find Platform
         id: platform
         run: |
           OS=${{ matrix.os }}
-          JMOD_HOME=${{ runner.temp }}/javafx-jmods-${{ steps.jmod.outputs.jmod_version }}
+          JMOD_HOME=${{ runner.temp }}/javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
           if [[ "$OS" == "macos-latest" ]]; then
             echo ::set-output name=platform::osx
           elif [[ "$OS" == "windows-latest" ]]; then
             echo ::set-output name=platform::windows
-            JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_version }}
+            JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
             RUNTIME=target\\runtime
             JAVA_RUNTIME=$RUNTIME\\bin\\java
           else
@@ -218,7 +228,7 @@ jobs:
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ env.jmod_version }}/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip
           unzip /tmp/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip -d ${{ runner.temp }}
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
@@ -226,7 +236,7 @@ jobs:
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ env.jmod_version }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
+          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
           Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip D:\
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
