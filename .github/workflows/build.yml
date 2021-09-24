@@ -114,16 +114,17 @@ jobs:
         run: |
           SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
           echo ::set-output name=sdk_version::$SDK_VERSION
+          VERSIONPATH=$SDK_VERSION
+          if [[ "$VERSIONPATH" == *"ea"* ]]; then
+             VERSIONPATH=`echo $VERSIONPATH | cut -d'-' -f 1`
+          fi
+          echo ::set-output name=sdk_versionpath::$VERSIONPATH
         shell: bash
       - name: Find Platform
         id: platform
         run: |
           OS=${{ matrix.os }}
           SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
-          VERSIONPATH=${{ steps.sdk.outputs.sdk_version }}
-          if [[ "$VERSIONPATH" == *"ea"* ]]; then
-             VERSIONPATH = echo $VERSIONPATH | cut -d'-' -f 1 
-          fi
           if [[ "$OS" == "macos-latest" ]]; then
             echo ::set-output name=platform::osx
           elif [[ "$OS" == "windows-latest" ]]; then
@@ -133,12 +134,11 @@ jobs:
             echo ::set-output name=platform::linux
           fi
           echo ::set-output name=javafx::$SDK
-          echo ::set-output name=versionpath::$VERSIONPATH
         shell: bash
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.platform.outputs.versionpath }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
           unzip /tmp/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip -d /tmp
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
@@ -146,7 +146,7 @@ jobs:
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.platform.outputs.versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
+          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
           Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
