@@ -124,12 +124,12 @@ jobs:
         id: platform
         run: |
           OS=${{ matrix.os }}
-          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           if [[ "$OS" == "macos-latest" ]]; then
             echo ::set-output name=platform::osx
           elif [[ "$OS" == "windows-latest" ]]; then
             echo ::set-output name=platform::windows
-            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_version }}
+            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           else
             echo ::set-output name=platform::linux
           fi
