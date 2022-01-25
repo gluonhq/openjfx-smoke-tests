@@ -146,8 +146,9 @@ jobs:
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
-          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
+          unzip /tmp/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip -d D:
+        shell: bash
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (Linux)
