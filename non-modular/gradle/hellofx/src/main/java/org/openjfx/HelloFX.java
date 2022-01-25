@@ -16,7 +16,7 @@ public class HelloFX extends Application {
         String javafxVersion = System.getProperty("javafx.version");
 
         // Test JavaFX version
-        String javaFXSettingVersion = System.getProperty("settings.javafx.version");
+        String javaFXSettingVersion = trimEAVersion(System.getProperty("settings.javafx.version"));
         if (!javaFXSettingVersion.equals(javafxVersion)) {
             System.out.println("Mismatch of JavaFX version occurred. Expected: '" + javaFXSettingVersion + "' but found: '" + javafxVersion + "'.");
             System.exit(1);
@@ -41,6 +41,13 @@ public class HelloFX extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    private String trimEAVersion(String property) {
+        if (property.contains("+")) {
+            property = property.substring(0, property.indexOf("+"));
+        }
+        return property;
     }
 
 }
