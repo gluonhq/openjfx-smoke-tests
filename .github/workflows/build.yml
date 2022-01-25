@@ -273,7 +273,7 @@ jobs:
           --add-modules javafx.fxml,javafx.controls,hellofx `
           --output ${{ env.RUNTIME }} `
           --strip-debug --compress 2 --no-header-files --no-man-pages
-          ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version="${{ env.jmod_version }}" -m hellofx/org.openjfx.MainApp
+          ${{ env.JAVA_RUNTIME }} --% -Dsettings.javafx.version="${{ env.jmod_version }}" -m hellofx/org.openjfx.MainApp
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
