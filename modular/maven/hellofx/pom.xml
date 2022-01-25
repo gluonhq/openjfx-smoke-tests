@@ -59,6 +59,9 @@
                     <jlinkImageName>hellofx</jlinkImageName>
                     <launcher>launcher</launcher>
                     <mainClass>hellofx/org.openjfx.MainApp</mainClass>
+                    <options>
+                        <option>-Dsettings.javafx.version=${javafx.version}</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>

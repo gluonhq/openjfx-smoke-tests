@@ -31,7 +31,7 @@
       <version>${javafx.version}</version>
     </dependency>
   </dependencies>
-  
+
   <build>
       <plugins>
           <plugin>
@@ -48,6 +48,9 @@
               <version>${javafx.maven.plugin.version}</version>
               <configuration>
                   <mainClass>org.openjfx.Launcher</mainClass>
+                  <options>
+                      <option>-Dsettings.javafx.version=${javafx.version}</option>
+                  </options>
               </configuration>
           </plugin>
     </plugins>

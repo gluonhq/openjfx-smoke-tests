@@ -161,25 +161,28 @@ jobs:
           vncserver :90 -localhost -nolisten tcp
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
-          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }}
+          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }} -Pjavafx_version=${{ env.sdk_version }}
           vncserver -kill :90
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (MacOS)
         if: runner.os == 'macOS'
         run: |
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
-          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }}
+          ./gradlew run -Psdk=${{ env.JAVAFX_HOME }} -Pjavafx_version=${{ env.sdk_version }}
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (Windows)
         if: runner.os == 'windows'
         run: |
           cd ${{ matrix.type }}/gradle/hellofx
-          .\gradlew run -Psdk="${{ env.JAVAFX_HOME }}"
+          .\gradlew run -Psdk="${{ env.JAVAFX_HOME }}" -Pjavafx_version="${{ env.sdk_version }}"
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
   jmod:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -251,11 +254,12 @@ jobs:
           --add-modules javafx.fxml,javafx.controls,hellofx \
           --output ${{ env.RUNTIME }} \
           --strip-debug --compress 2 --no-header-files --no-man-pages
-          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+          ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
           JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
+          jmod_version: ${{ steps.jmod.outputs.jmod_version }}
 
       - name: Test JMODS (Windows)
         if: runner.os == 'Windows'
@@ -269,11 +273,12 @@ jobs:
           --add-modules javafx.fxml,javafx.controls,hellofx `
           --output ${{ env.RUNTIME }} `
           --strip-debug --compress 2 --no-header-files --no-man-pages
-          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+          ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
-          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}   
+          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
+          jmod_version: ${{ steps.jmod.outputs.jmod_version }}
 
       - name: Test JMODS (Linux)
         if: runner.os == 'Linux'
@@ -292,9 +297,10 @@ jobs:
           echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
           chmod -v 600 /home/runner/.vnc/passwd
           vncserver :90 -localhost -nolisten tcp
-          ${{ env.JAVA_RUNTIME }} -m hellofx/org.openjfx.MainApp
+          ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
           vncserver -kill :90
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
           JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
+          jmod_version: ${{ steps.jmod.outputs.jmod_version }}
