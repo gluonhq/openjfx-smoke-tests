@@ -145,11 +145,9 @@ jobs:
           platform: ${{ steps.platform.outputs.platform }}
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
-        uses: carlosperate/download-file-action@v1
-        with:
-          file-url: 'https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip'
-          file-name: 'openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip'
-          location: 'D:'
+        run: |
+          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
+          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (Linux)
@@ -241,7 +239,7 @@ jobs:
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          bitsadmin /Transfer DownloadJavaFX https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
+          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
           Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip D:\
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
