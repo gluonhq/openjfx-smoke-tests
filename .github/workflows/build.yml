@@ -38,8 +38,8 @@ jobs:
           vncserver :90 -localhost -nolisten tcp
           mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
           mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
-          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
           vncserver -kill :90
         env:
           staging_url: ${{ steps.staging.outputs.staging_url }}
@@ -49,8 +49,8 @@ jobs:
         run: |
           mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
           mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
-          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
         env:
           staging_url: ${{ steps.staging.outputs.staging_url }}
           maven_version: ${{ steps.staging.outputs.maven_version }}
@@ -59,8 +59,8 @@ jobs:
         run: |
           mvn -q versions:set-property -Dproperty="staging.repo.url" -DnewVersion="${{ env.staging_url }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
           mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn clean compile -f ${{ matrix.type }}/maven/hellofx
-          mvn javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
         env:
           staging_url: ${{ steps.staging.outputs.staging_url }}
           maven_version: ${{ steps.staging.outputs.maven_version }}
