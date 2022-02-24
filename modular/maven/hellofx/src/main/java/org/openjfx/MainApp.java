@@ -12,6 +12,16 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        String javaVersion = System.getProperty("java.version");
+        String javafxVersion = System.getProperty("javafx.version");
+
+        // Test JavaFX version
+        String javaFXSettingVersion = trimEAVersion(System.getProperty("settings.javafx.version"));
+        if (!javaFXSettingVersion.equals(javafxVersion)) {
+            System.out.println("Mismatch of JavaFX version occurred. Expected: '" + javaFXSettingVersion + "' but found: '" + javafxVersion + "'.");
+            System.exit(1);
+        }
+
         System.out.println("Starting Application...");
         Parent root = FXMLLoader.load(getClass().getResource("scene.fxml"));
         
@@ -22,8 +32,6 @@ public class MainApp extends Application {
         stage.setScene(scene);
         stage.show();
 
-        String javaVersion = System.getProperty("java.version");
-        String javafxVersion = System.getProperty("javafx.version");
         System.out.println("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
 
         if (System.getProperty("javafx.platform") == null) {
@@ -38,6 +46,13 @@ public class MainApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private String trimEAVersion(String property) {
+        if (property.contains("+")) {
+            property = property.substring(0, property.indexOf("+"));
+        }
+        return property;
     }
 
 }

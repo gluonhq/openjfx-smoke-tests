@@ -12,9 +12,17 @@ public class HelloFX extends Application {
 
     @Override
     public void start(Stage stage) {
-        System.out.println("Starting Application...");
         String javaVersion = System.getProperty("java.version");
         String javafxVersion = System.getProperty("javafx.version");
+
+        // Test JavaFX version
+        String javaFXSettingVersion = trimEAVersion(System.getProperty("settings.javafx.version"));
+        if (!javaFXSettingVersion.equals(javafxVersion)) {
+            System.out.println("Mismatch of JavaFX version occurred. Expected: '" + javaFXSettingVersion + "' but found: '" + javafxVersion + "'.");
+            System.exit(1);
+        }
+
+        System.out.println("Starting Application...");
         Label l = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
         Scene scene = new Scene(new StackPane(l), 640, 480);
         stage.setScene(scene);
@@ -33,6 +41,13 @@ public class HelloFX extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    private String trimEAVersion(String property) {
+        if (property.contains("+")) {
+            property = property.substring(0, property.indexOf("+"));
+        }
+        return property;
     }
 
 }

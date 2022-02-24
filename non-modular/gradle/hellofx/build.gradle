@@ -19,4 +19,8 @@ javafx {
     modules = [ 'javafx.controls' ]
 }
 
+run {
+    systemProperty "settings.javafx.version", project.hasProperty('javafx_version') ? project.property('javafx_version') : ''
+}
+
 mainClassName = 'org.openjfx.Launcher'

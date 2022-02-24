@@ -20,4 +20,8 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+run {
+    systemProperty "settings.javafx.version", project.hasProperty('javafx_version') ? project.property('javafx_version') : ''
+}
+
 mainClassName = "org.openjfx.MainApp"
