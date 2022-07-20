@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master, fix-linux-smoke-tests ]
+    branches: [ master ]
 
 jobs:
   maven-central:
