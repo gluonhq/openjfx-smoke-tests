@@ -30,17 +30,12 @@ jobs:
       - name: Test Maven (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
           export DISPLAY=:90
-          mkdir /home/runner/.vnc
-          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
-          chmod -v 600 /home/runner/.vnc/passwd
-          vncserver :90 -localhost -nolisten tcp
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
           mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
           mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
           mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
-          vncserver -kill :90
         env:
           staging_url: ${{ steps.staging.outputs.staging_url }}
           maven_version: ${{ steps.staging.outputs.maven_version }}
@@ -68,13 +63,10 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           export DISPLAY=:90
-          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
-          chmod -v 600 /home/runner/.vnc/passwd
-          vncserver :90 -localhost -nolisten tcp
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
           ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
-          vncserver -kill :90
         env:
           staging_url: ${{ steps.staging.outputs.staging_url }}
           maven_version: ${{ steps.staging.outputs.maven_version }}
@@ -153,16 +145,11 @@ jobs:
       - name: Test Gradle (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
           export DISPLAY=:90
-          mkdir /home/runner/.vnc
-          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
-          chmod -v 600 /home/runner/.vnc/passwd
-          vncserver :90 -localhost -nolisten tcp
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
           ./gradlew run -Psdk=${{ env.JAVAFX_HOME }} -Pjavafx_version=${{ env.sdk_version }}
-          vncserver -kill :90
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
@@ -291,14 +278,9 @@ jobs:
           --add-modules javafx.fxml,javafx.controls,hellofx \
           --output ${{ env.RUNTIME }} \
           --strip-debug --compress 2 --no-header-files --no-man-pages
-          sudo apt-get install xvfb tigervnc-standalone-server tigervnc-common
           export DISPLAY=:90
-          mkdir /home/runner/.vnc
-          echo 123456 | vncpasswd -f > /home/runner/.vnc/passwd
-          chmod -v 600 /home/runner/.vnc/passwd
-          vncserver :90 -localhost -nolisten tcp
+          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
-          vncserver -kill :90
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
