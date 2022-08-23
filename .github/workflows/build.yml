@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: 16
+          java-version: 17
       - name: Find staging url
         id: staging
         run: |
@@ -100,7 +100,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: 16
+          java-version: 17
       - name: Find SDK version
         id: sdk
         run: |
@@ -182,7 +182,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: 16
+          java-version: 17
       - name: Find JMOD version
         id: jmod
         run: |
