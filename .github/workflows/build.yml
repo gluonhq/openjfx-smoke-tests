@@ -62,8 +62,8 @@ jobs:
       - name: Test Gradle (Linux)
         if: runner.os == 'Linux'
         run: |
-          export DISPLAY=:90
-          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          export DISPLAY=:92
+          Xvfb -ac :92 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
           ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
@@ -145,8 +145,8 @@ jobs:
       - name: Test Gradle (Linux)
         if: runner.os == 'Linux'
         run: |
-          export DISPLAY=:90
-          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          export DISPLAY=:94
+          Xvfb -ac :94 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
           ./gradlew run -Psdk=${{ env.JAVAFX_HOME }} -Pjavafx_version=${{ env.sdk_version }}
@@ -278,8 +278,8 @@ jobs:
           --add-modules javafx.fxml,javafx.controls,hellofx \
           --output ${{ env.RUNTIME }} \
           --strip-debug --compress 2 --no-header-files --no-man-pages
-          export DISPLAY=:90
-          Xvfb -ac :90 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          export DISPLAY=:96
+          Xvfb -ac :96 -screen 0 1280x1024x24 > /dev/null 2>&1 &
           ${{ env.JAVA_RUNTIME }} -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
         env:
           RUNTIME: ${{ steps.platform.outputs.runtime }}
