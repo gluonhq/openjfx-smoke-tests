@@ -24,8 +24,8 @@ jobs:
         run: |
           STAGING_URL=`cat settings.properties | grep staging_url | cut -d'=' -f2`
           MAVEN_VERSION=`cat settings.properties | grep maven_version | cut -d'=' -f2`
-          echo ::set-output name=staging_url::$STAGING_URL
-          echo ::set-output name=maven_version::$MAVEN_VERSION
+          echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
+          echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
         shell: bash
       - name: Test Maven (Linux)
         if: runner.os == 'Linux'
@@ -101,12 +101,12 @@ jobs:
         id: sdk
         run: |
           SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
-          echo ::set-output name=sdk_version::$SDK_VERSION
+          echo "sdk_version=$SDK_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$SDK_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
              VERSIONPATH=`echo $VERSIONPATH | cut -d'-' -f 1`
           fi
-          echo ::set-output name=sdk_versionpath::$VERSIONPATH
+          echo "sdk_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
       - name: Find Platform
         id: platform
@@ -114,14 +114,14 @@ jobs:
           OS=${{ matrix.os }}
           SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           if [[ "$OS" == "macos-latest" ]]; then
-            echo ::set-output name=platform::osx
+            echo "platform=osx" >> $GITHUB_OUTPUT
           elif [[ "$OS" == "windows-latest" ]]; then
-            echo ::set-output name=platform::windows
+            echo "platform=windows" >> $GITHUB_OUTPUT
             SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           else
-            echo ::set-output name=platform::linux
+            echo "platform=linux" >> $GITHUB_OUTPUT
           fi
-          echo ::set-output name=javafx::$SDK
+          echo "javafx=$SDK" >> $GITHUB_OUTPUT
         shell: bash
       - name: Setup JavaFX
         if: runner.os != 'Windows'
@@ -181,12 +181,12 @@ jobs:
         id: jmod
         run: |
           JMOD_VERSION=`cat settings.properties | grep jmod_version | cut -d'=' -f2`
-          echo ::set-output name=jmod_version::$JMOD_VERSION
+          echo "jmod_version=$JMOD_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$JMOD_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
              VERSIONPATH=`echo $VERSIONPATH | cut -d'-' -f 1`
           fi
-          echo ::set-output name=jmod_versionpath::$VERSIONPATH
+          echo "jmod_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
       - name: Find Platform
         id: platform
@@ -196,18 +196,18 @@ jobs:
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
           if [[ "$OS" == "macos-latest" ]]; then
-            echo ::set-output name=platform::osx
+            echo "platform=osx" >> $GITHUB_OUTPUT
           elif [[ "$OS" == "windows-latest" ]]; then
-            echo ::set-output name=platform::windows
+            echo "platform=windows" >> $GITHUB_OUTPUT
             JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
             RUNTIME=target\\runtime
             JAVA_RUNTIME=$RUNTIME\\bin\\java
           else
-            echo ::set-output name=platform::linux
+            echo "platform=linux" >> $GITHUB_OUTPUT
           fi
-          echo ::set-output name=jmod_home::$JMOD_HOME
-          echo ::set-output name=runtime::$RUNTIME
-          echo ::set-output name=java_runtime::$JAVA_RUNTIME
+          echo "jmod_home=$JMOD_HOME" >> $GITHUB_OUTPUT
+          echo "runtime=$RUNTIME" >> $GITHUB_OUTPUT
+          echo "java_runtime=$JAVA_RUNTIME" >> $GITHUB_OUTPUT
         shell: bash
       - name: Setup JavaFX
         if: runner.os != 'Windows'
