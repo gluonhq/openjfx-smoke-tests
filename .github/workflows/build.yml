@@ -10,15 +10,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
         type: [ modular, non-modular ]
+        include:
+          - os: ubuntu-latest
+            ARCH: "x64"
+          - os: windows-latest
+            ARCH: "x64"
+          - os: macos-13
+            ARCH: "x64"
+          - os: macos-latest
+            ARCH: "aarch64"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 22
+          architecture: ${{ matrix.ARCH }}
       - name: Find staging url
         id: staging
         run: |
@@ -88,15 +98,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
         type: [ modular, non-modular ]
+        include:
+          - os: ubuntu-latest
+            ARCH: "x64"
+            platform: "linux"
+          - os: windows-latest
+            ARCH: "x64"
+            platform: "windows"
+          - os: macos-13
+            ARCH: "x64"
+            platform: "osx"
+          - os: macos-latest
+            ARCH: "aarch64"
+            platform: "osx"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 22
+          architecture: ${{ matrix.ARCH }}
       - name: Find SDK version
         id: sdk
         run: |
@@ -108,34 +132,28 @@ jobs:
           fi
           echo "sdk_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
-      - name: Find Platform
+      - name: Find SDK path
         id: platform
         run: |
           OS=${{ matrix.os }}
           SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
-          if [[ "$OS" == "macos-latest" ]]; then
-            echo "platform=osx" >> $GITHUB_OUTPUT
-          elif [[ "$OS" == "windows-latest" ]]; then
-            echo "platform=windows" >> $GITHUB_OUTPUT
+          if [[ "$OS" == "windows-latest" ]]; then
             SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
-          else
-            echo "platform=linux" >> $GITHUB_OUTPUT
           fi
           echo "javafx=$SDK" >> $GITHUB_OUTPUT
         shell: bash
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip
-          unzip /tmp/openjfx-${{ env.sdk_version }}_${{ env.platform }}-x64_bin-sdk.zip -d /tmp
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip
+          unzip /tmp/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip -d /tmp
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
-          platform: ${{ steps.platform.outputs.platform }}
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip
-          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-x64_bin-sdk.zip D:\
+          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip
+          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip D:\
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (Linux)
@@ -169,14 +187,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
+        include:
+          - os: ubuntu-latest
+            ARCH: "x64"
+            platform: "linux"
+          - os: windows-latest
+            ARCH: "x64"
+            platform: "windows"
+          - os: macos-13
+            ARCH: "x64"
+            platform: "osx"
+          - os: macos-latest
+            ARCH: "aarch64"
+            platform: "osx"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 22
+          architecture: ${{ matrix.ARCH }}
       - name: Find JMOD version
         id: jmod
         run: |
@@ -188,22 +220,17 @@ jobs:
           fi
           echo "jmod_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
-      - name: Find Platform
+      - name: Find JMOD home
         id: platform
         run: |
           OS=${{ matrix.os }}
           JMOD_HOME=${{ runner.temp }}/javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
-          if [[ "$OS" == "macos-latest" ]]; then
-            echo "platform=osx" >> $GITHUB_OUTPUT
-          elif [[ "$OS" == "windows-latest" ]]; then
-            echo "platform=windows" >> $GITHUB_OUTPUT
+          if [[ "$OS" == "windows-latest" ]]; then
             JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
             RUNTIME=target\\runtime
             JAVA_RUNTIME=$RUNTIME\\bin\\java
-          else
-            echo "platform=linux" >> $GITHUB_OUTPUT
           fi
           echo "jmod_home=$JMOD_HOME" >> $GITHUB_OUTPUT
           echo "runtime=$RUNTIME" >> $GITHUB_OUTPUT
@@ -212,16 +239,15 @@ jobs:
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip
-          unzip /tmp/openjfx-${{ env.jmod_version }}_${{ env.platform }}-x64_bin-jmods.zip -d ${{ runner.temp }}
+          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip
+          unzip /tmp/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip -d ${{ runner.temp }}
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
-          platform: ${{ steps.platform.outputs.platform }}
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip
-          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-x64_bin-jmods.zip D:\
+          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip
+          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip D:\
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
       - name: Test JMODS (MacOS)
