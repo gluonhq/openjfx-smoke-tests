@@ -17,7 +17,7 @@ javafx {
     } else {
         version = project.hasProperty('javafx_version') ? project.property('javafx_version') : '17'
     }
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.web', 'javafx.fxml' ]
 }
 
 run {
