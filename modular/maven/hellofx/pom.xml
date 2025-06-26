@@ -14,20 +14,12 @@
         <maven.compiler.release>11</maven.compiler.release>
         <javafx.version>17.0.2</javafx.version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
-        <staging.repo.url>https://oss.sonatype.org/service/local/repositories/orgopenjfx-1148/content</staging.repo.url>
     </properties>
 
     <organization>
         <!-- Used as the 'Vendor' for JNLP generation -->
         <name>Your Organisation</name>
     </organization>
-
-    <repositories>
-        <repository>
-            <id>staging</id>
-            <url>${staging.repo.url}</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>

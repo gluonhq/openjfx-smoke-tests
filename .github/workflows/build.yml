@@ -29,70 +29,65 @@ jobs:
           distribution: 'temurin'
           java-version: 22
           architecture: ${{ matrix.ARCH }}
-      - name: Find staging url
-        id: staging
+      - name: Find javafx version
+        id: version
         run: |
-          STAGING_URL=`cat settings.properties | grep staging_url | cut -d'=' -f2`
           MAVEN_VERSION=`cat settings.properties | grep maven_version | cut -d'=' -f2`
-          echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
           echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
         shell: bash
       - name: Test Maven (Linux)
         if: runner.os == 'Linux'
         run: |
-          mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
-          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
       - name: Test Maven (Mac)
         if: runner.os == 'macOS'
         run: |
-          mvn -q versions:set-property -Dproperty=staging.repo.url -DnewVersion=${{ env.staging_url }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
       - name: Test Maven (Windows)
         if: runner.os == 'windows'
         run: |
-          mvn -q versions:set-property -Dproperty="staging.repo.url" -DnewVersion="${{ env.staging_url }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx
+          mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -Pcentral.manual.testing
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
       - name: Test Gradle (Linux)
         if: runner.os == 'Linux'
         run: |
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
-          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
+          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" ./gradlew run -Pjavafx_version=${{ env.maven_version }}
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
       - name: Test Gradle (Mac)
         if: runner.os == 'macOS'
         run: |
           cd ${{ matrix.type }}/gradle/hellofx
           chmod +x gradlew
-          ./gradlew run -Pstaging=${{ env.staging_url }} -Pjavafx_version=${{ env.maven_version }}
+          ./gradlew run -Pjavafx_version=${{ env.maven_version }}
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
       - name: Test Gradle (Windows)
         if: runner.os == 'windows'
         run: |
           cd ${{ matrix.type }}/gradle/hellofx
-          .\gradlew run -Pstaging="${{ env.staging_url }}" -Pjavafx_version="${{ env.maven_version }}"
+          .\gradlew run -Pjavafx_version="${{ env.maven_version }}"
         env:
-          staging_url: ${{ steps.staging.outputs.staging_url }}
-          maven_version: ${{ steps.staging.outputs.maven_version }}
+          maven_version: ${{ steps.version.outputs.maven_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
   sdk:
     runs-on: ${{ matrix.os }}
     strategy:
