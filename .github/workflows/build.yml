@@ -302,3 +302,23 @@ jobs:
           JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
           JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
+  maven-central-publish:
+    needs: [maven-central, sdk, jmod]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find deployment id
+        id: deployment_id
+        run: |
+          MAVEN_DEPLOYMENT_ID=`cat settings.properties | grep maven_deployment_id | cut -d'=' -f2`
+          echo "maven_deployment_id=$MAVEN_DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: Publish Deployment
+        run: |
+          curl --request POST \
+            --header "Authorization: Bearer ${{ env.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}" \
+            "https://central.sonatype.com/api/v1/publisher/deployment/${{ env.maven_deployment_id }}"
+        env:
+          maven_deployment_id: ${{ steps.deployment_id.outputs.maven_deployment_id }}
+          MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
+
