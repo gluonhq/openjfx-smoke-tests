@@ -30,6 +30,7 @@ jobs:
           java-version: 22
           architecture: ${{ matrix.ARCH }}
           settings-path: ${{ github.workspace }}
+          overwrite-settings: false
       - name: Find javafx version
         id: version
         run: |
@@ -161,6 +162,7 @@ jobs:
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
       - name: Test Gradle (MacOS)
         if: runner.os == 'macOS'
         run: |
@@ -170,6 +172,7 @@ jobs:
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
       - name: Test Gradle (Windows)
         if: runner.os == 'windows'
         run: |
@@ -178,6 +181,7 @@ jobs:
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+          ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
   jmod:
     runs-on: ${{ matrix.os }}
     strategy:
