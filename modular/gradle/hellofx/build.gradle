@@ -27,6 +27,7 @@ javafx {
 
 run {
     systemProperty "settings.javafx.version", project.hasProperty('javafx_version') ? project.property('javafx_version') : ''
+    systemProperty "prism.verbose", "true"
 }
 
 mainClassName = "org.openjfx.MainApp"

@@ -42,6 +42,7 @@
                   <mainClass>org.openjfx.Launcher</mainClass>
                   <options>
                       <option>-Dsettings.javafx.version=${javafx.version}</option>
+                      <option>-Dprism.verbose=true</option>
                   </options>
               </configuration>
           </plugin>
