@@ -54,6 +54,7 @@
                     <options>
                         <option>-Dsettings.javafx.version=${javafx.version}</option>
                         <option>-Dprism.verbose=true</option>
+                        <option>-Dprism.order=es2,sw</option>
                     </options>
                 </configuration>
             </plugin>
