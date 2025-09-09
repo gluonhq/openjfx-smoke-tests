@@ -10,14 +10,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13-selfhosted, macos-latest, windows-latest, ubuntu-latest ]
         type: [ modular, non-modular ]
         include:
           - os: ubuntu-latest
             ARCH: "x64"
           - os: windows-latest
             ARCH: "x64"
-          - os: macos-13
+          - os: macos-13-selfhosted
             ARCH: "x64"
           - os: macos-latest
             ARCH: "aarch64"
@@ -93,7 +93,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13-selfhosted, macos-latest, windows-latest, ubuntu-latest ]
         type: [ modular, non-modular ]
         include:
           - os: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
           - os: windows-latest
             ARCH: "x64"
             platform: "windows"
-          - os: macos-13
+          - os: macos-13-selfhosted
             ARCH: "x64"
             platform: "osx"
           - os: macos-latest
@@ -185,7 +185,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13, macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-13-selfhosted, macos-latest, windows-latest, ubuntu-latest ]
         include:
           - os: ubuntu-latest
             ARCH: "x64"
@@ -193,7 +193,7 @@ jobs:
           - os: windows-latest
             ARCH: "x64"
             platform: "windows"
-          - os: macos-13
+          - os: macos-13-selfhosted
             ARCH: "x64"
             platform: "osx"
           - os: macos-latest
