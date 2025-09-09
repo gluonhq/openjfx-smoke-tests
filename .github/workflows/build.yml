@@ -233,12 +233,12 @@ jobs:
         if: runner.os == 'Windows'
         id: platform_win
         run: |
-          $env:JMOD_HOME = ${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
-          $env:RUNTIME = target\\runtime
-          $env:JAVA_RUNTIME = $RUNTIME\\bin\\java
-          echo "jmod_home=$JMOD_HOME" >> $env:GITHUB_OUTPUT
-          echo "runtime=$RUNTIME" >> $env:GITHUB_OUTPUT
-          echo "java_runtime=$JAVA_RUNTIME" >> $env:GITHUB_OUTPUT
+          $env:JMOD_HOME = ${{ runner.temp }}\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
+          $env:RUNTIME = 'target\runtime'
+          $env:JAVA_RUNTIME = $env:RUNTIME + '\bin\java'
+          echo "jmod_home=$env:JMOD_HOME" >> $env:GITHUB_OUTPUT
+          echo "runtime=$env:RUNTIME" >> $env:GITHUB_OUTPUT
+          echo "java_runtime=$env:JAVA_RUNTIME" >> $env:GITHUB_OUTPUT
         shell: pwsh
       - name: Setup JavaFX
         if: runner.os != 'Windows'
