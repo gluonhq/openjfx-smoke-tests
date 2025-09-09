@@ -233,9 +233,9 @@ jobs:
         if: runner.os == 'Windows'
         id: platform_win
         run: |
-          JMOD_HOME=${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
-          RUNTIME=target\\runtime
-          JAVA_RUNTIME=$RUNTIME\\bin\\java
+          $env:JMOD_HOME = ${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
+          $env:RUNTIME = target\\runtime
+          $env:JAVA_RUNTIME = $RUNTIME\\bin\\java
           echo "jmod_home=$JMOD_HOME" >> $env:GITHUB_OUTPUT
           echo "runtime=$RUNTIME" >> $env:GITHUB_OUTPUT
           echo "java_runtime=$JAVA_RUNTIME" >> $env:GITHUB_OUTPUT
