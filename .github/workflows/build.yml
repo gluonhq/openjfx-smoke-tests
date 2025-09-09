@@ -133,7 +133,7 @@ jobs:
           OS=${{ matrix.os }}
           SDK=${{ runner.temp }}/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           if [[ "$OS" == "windows-latest" ]]; then
-            SDK=${{ runner.temp }}\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
+            SDK=${{ runner.temp }}\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           fi
           echo "javafx=$SDK" >> $GITHUB_OUTPUT
         shell: bash
@@ -226,7 +226,7 @@ jobs:
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
           if [[ "$OS" == "windows-latest" ]]; then
-            JMOD_HOME=${{ runner.temp }}\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
+            JMOD_HOME=${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
             RUNTIME=target\\runtime
             JAVA_RUNTIME=$RUNTIME\\bin\\java
           fi
