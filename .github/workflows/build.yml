@@ -131,24 +131,24 @@ jobs:
         id: platform
         run: |
           OS=${{ matrix.os }}
-          SDK=/tmp/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
+          SDK=${{ runner.temp }}/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           if [[ "$OS" == "windows-latest" ]]; then
-            SDK=D:\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
+            SDK=${{ runner.temp }}\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
           fi
           echo "javafx=$SDK" >> $GITHUB_OUTPUT
         shell: bash
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip
-          unzip /tmp/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip -d /tmp
+          wget -P ${{ runner.temp }} https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip
+          unzip ${{ runner.temp }}/openjfx-${{ env.sdk_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-sdk.zip -d ${{ runner.temp }}
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
-          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip D:\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip
-          Expand-Archive -Force D:\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip D:\
+          Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip ${{ runner.temp }}\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip
+          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip ${{ runner.temp }}\
         env:
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Gradle (Linux)
@@ -226,7 +226,7 @@ jobs:
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
           if [[ "$OS" == "windows-latest" ]]; then
-            JMOD_HOME=D:\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
+            JMOD_HOME=${{ runner.temp }}\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
             RUNTIME=target\\runtime
             JAVA_RUNTIME=$RUNTIME\\bin\\java
           fi
@@ -237,15 +237,15 @@ jobs:
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
-          wget -P /tmp https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip
-          unzip /tmp/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip -d ${{ runner.temp }}
+          wget -P ${{ runner.temp }} https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip
+          unzip ${{ runner.temp }}/openjfx-${{ env.jmod_version }}_${{ matrix.platform }}-${{ matrix.ARCH }}_bin-jmods.zip -d ${{ runner.temp }}
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
       - name: Setup JavaFX (Windows)
         if: runner.os == 'Windows'
         run: |
           Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.jmod.outputs.jmod_versionpath }}/openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip
-          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip D:\
+          Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.jmod_version }}_windows-${{ matrix.ARCH }}_bin-jmods.zip ${{ runner.temp }}\
         env:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
       - name: Test JMODS (MacOS)
