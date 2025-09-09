@@ -219,21 +219,27 @@ jobs:
           echo "jmod_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
       - name: Find JMOD home
+        if: runner.os != 'Windows'
         id: platform
         run: |
-          OS=${{ matrix.os }}
           JMOD_HOME=${{ runner.temp }}/javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
           RUNTIME=target/runtime
           JAVA_RUNTIME=$RUNTIME/bin/java
-          if [[ "$OS" == "windows-latest" ]]; then
-            JMOD_HOME=${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
-            RUNTIME=target\\runtime
-            JAVA_RUNTIME=$RUNTIME\\bin\\java
-          fi
           echo "jmod_home=$JMOD_HOME" >> $GITHUB_OUTPUT
           echo "runtime=$RUNTIME" >> $GITHUB_OUTPUT
           echo "java_runtime=$JAVA_RUNTIME" >> $GITHUB_OUTPUT
         shell: bash
+      - name: Find JMOD home (Windows)
+        if: runner.os == 'Windows'
+        id: platform_win
+        run: |
+          JMOD_HOME=${{ runner.temp }}\\javafx-jmods-${{ steps.jmod.outputs.jmod_versionpath }}
+          RUNTIME=target\\runtime
+          JAVA_RUNTIME=$RUNTIME\\bin\\java
+          echo "jmod_home=$JMOD_HOME" >> $env:GITHUB_OUTPUT
+          echo "runtime=$RUNTIME" >> $env:GITHUB_OUTPUT
+          echo "java_runtime=$JAVA_RUNTIME" >> $env:GITHUB_OUTPUT
+        shell: pwsh
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
@@ -280,9 +286,9 @@ jobs:
           --strip-debug --compress 2 --no-header-files --no-man-pages
           ${{ env.JAVA_RUNTIME }} --% -Dsettings.javafx.version=${{ env.jmod_version }} -m hellofx/org.openjfx.MainApp
         env:
-          RUNTIME: ${{ steps.platform.outputs.runtime }}
-          JAVA_RUNTIME: ${{ steps.platform.outputs.java_runtime }}
-          JMOD_HOME: ${{ steps.platform.outputs.jmod_home }}
+          RUNTIME: ${{ steps.platform_win.outputs.runtime }}
+          JAVA_RUNTIME: ${{ steps.platform_win.outputs.java_runtime }}
+          JMOD_HOME: ${{ steps.platform_win.outputs.jmod_home }}
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
 
       - name: Test JMODS (Linux)
