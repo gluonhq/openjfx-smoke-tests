@@ -128,15 +128,19 @@ jobs:
           echo "sdk_versionpath=$VERSIONPATH" >> $GITHUB_OUTPUT
         shell: bash
       - name: Find SDK path
+        if: runner.os != 'Windows'
         id: platform
         run: |
-          OS=${{ matrix.os }}
           SDK=${{ runner.temp }}/javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
-          if [[ "$OS" == "windows-latest" ]]; then
-            SDK=${{ runner.temp }}\\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}
-          fi
           echo "javafx=$SDK" >> $GITHUB_OUTPUT
         shell: bash
+      - name: Find SDK path (Windows)
+        if: runner.os == 'Windows'
+        id: platform_win
+        run: |
+          $env:SDK = '${{ runner.temp }}\javafx-sdk-${{ steps.sdk.outputs.sdk_versionpath }}'
+          echo "javafx=$env:SDK" >> $env:GITHUB_OUTPUT
+        shell: pwsh
       - name: Setup JavaFX
         if: runner.os != 'Windows'
         run: |
@@ -177,7 +181,7 @@ jobs:
           cd ${{ matrix.type }}/gradle/hellofx
           .\gradlew run -Psdk="${{ env.JAVAFX_HOME }}" -Pjavafx_version="${{ env.sdk_version }}"
         env:
-          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          JAVAFX_HOME: ${{ steps.platform_win.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
           ORG_GRADLE_PROJECT_centralManualTestingAuthHeaderValue: "Bearer ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}"
   jmod:
