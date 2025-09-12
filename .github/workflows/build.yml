@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 23
+          java-version: 24
           architecture: ${{ matrix.ARCH }}
       - name: Find javafx version
         id: version
@@ -114,7 +114,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 23
+          java-version: 24
           architecture: ${{ matrix.ARCH }}
       - name: Find SDK version
         id: sdk
@@ -209,7 +209,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 23
+          java-version: 24
           architecture: ${{ matrix.ARCH }}
       - name: Find JMOD version
         id: jmod
