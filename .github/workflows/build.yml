@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-13-selfhosted, macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-15-intel, macos-latest, windows-latest, ubuntu-latest ]
         type: [ modular, non-modular ]
         include:
           - os: ubuntu-latest
