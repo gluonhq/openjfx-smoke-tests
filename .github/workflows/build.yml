@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ purge-gradle ]
 
 jobs:
   maven-central:
@@ -128,6 +128,36 @@ jobs:
           Import-Module BitsTransfer; Start-BitsTransfer https://download2.gluonhq.com/openjfx/${{ steps.sdk.outputs.sdk_versionpath }}/openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip ${{ runner.temp }}\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip
           Expand-Archive -Force ${{ runner.temp }}\openjfx-${{ env.sdk_version }}_windows-${{ matrix.ARCH }}_bin-sdk.zip ${{ runner.temp }}\
         env:
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+      - name: Test Maven (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+        env:
+          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+      - name: Test Maven (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+        env:
+          JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
+          sdk_version: ${{ steps.sdk.outputs.sdk_version }}
+      - name: Test Maven (Windows)
+        if: runner.os == 'windows'
+        run: |
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+        env:
+          JAVAFX_HOME: ${{ steps.platform_win.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
   jmod:
     runs-on: ${{ matrix.os }}
