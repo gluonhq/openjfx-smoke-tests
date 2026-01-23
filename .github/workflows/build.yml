@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ jdk-composite-action ]
+    branches: [ master ]
 
 jobs:
   maven-central:
