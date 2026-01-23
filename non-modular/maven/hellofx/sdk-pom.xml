@@ -25,17 +25,24 @@
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
+            <artifactId>javafx-base</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${sdk}/lib/javafx.base.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
+            <artifactId>javafx-graphics</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${sdk}/lib/javafx.base.jar</systemPath>
+            <systemPath>${sdk}/lib/javafx.graphics.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${sdk}/lib/javafx.controls.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
