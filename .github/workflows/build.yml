@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ remove-gradle ]
+    branches: [ master ]
 
 jobs:
   maven-central:
