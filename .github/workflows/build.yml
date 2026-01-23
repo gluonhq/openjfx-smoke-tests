@@ -143,7 +143,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk "-DnewVersion=${{ env.JAVAFX_HOME }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
           mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
           mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
         env:
