@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ jdk-composite-action ]
 
 jobs:
   maven-central:
@@ -23,12 +23,8 @@ jobs:
             ARCH: "aarch64"
     steps:
       - uses: actions/checkout@v4
-      - name: Setup java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 24
-          architecture: ${{ matrix.ARCH }}
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
       - name: Find javafx version
         id: version
         run: |
@@ -110,12 +106,8 @@ jobs:
             platform: "osx"
     steps:
       - uses: actions/checkout@v4
-      - name: Setup java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 24
-          architecture: ${{ matrix.ARCH }}
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
       - name: Find SDK version
         id: sdk
         run: |
@@ -205,12 +197,8 @@ jobs:
             platform: "osx"
     steps:
       - uses: actions/checkout@v4
-      - name: Setup java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 24
-          architecture: ${{ matrix.ARCH }}
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
       - name: Find JMOD version
         id: jmod
         run: |

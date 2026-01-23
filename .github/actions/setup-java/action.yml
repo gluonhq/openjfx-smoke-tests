@@ -1,0 +1,15 @@
+name: Setup Java
+description: Install and configure Java
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: 25.0.2
+
+    - name: Export JPACKAGE_HOME
+      shell: bash
+      run: |
+        echo "JPACKAGE_HOME=$JAVA_HOME" >> $GITHUB_ENV
