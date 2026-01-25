@@ -38,27 +38,27 @@ jobs:
       - name: Test Maven (Linux)
         if: runner.os == 'Linux'
         run: |
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
-          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
+          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
         env:
           maven_version: ${{ steps.version.outputs.maven_version }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
       - name: Test Maven (Mac)
         if: runner.os == 'macOS'
         run: |
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.maven_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral-manual-testing
         env:
           maven_version: ${{ steps.version.outputs.maven_version }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
       - name: Test Maven (Windows)
         if: runner.os == 'windows'
         run: |
-          mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
+          mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral-manual-testing"
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral-manual-testing"
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral-manual-testing"
         env:
           maven_version: ${{ steps.version.outputs.maven_version }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
@@ -132,29 +132,29 @@ jobs:
       - name: Test Maven (Linux)
         if: runner.os == 'Linux'
         run: |
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          xvfb-run --auto-servernum --server-args="-ac -screen 0 1280x1024x24" mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Maven (MacOS)
         if: runner.os == 'macOS'
         run: |
-          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
         env:
           JAVAFX_HOME: ${{ steps.platform.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
       - name: Test Maven (Windows)
         if: runner.os == 'windows'
         run: |
-          mvn -q versions:set-property -Dproperty=sdk -DnewVersion='${{ env.JAVAFX_HOME }}' -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion='${{ env.JAVAFX_HOME }}' -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral-manual-testing
         env:
           JAVAFX_HOME: ${{ steps.platform_win.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}
