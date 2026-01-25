@@ -57,6 +57,7 @@ jobs:
         if: runner.os == 'windows'
         run: |
           mvn -q versions:set-property -Dproperty="javafx.version" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
+          mvn -q versions:set-property -Dproperty="sdk" -DnewVersion="${{ env.maven_version }}" -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
           mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
           mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral.manual.testing"
         env:
@@ -155,8 +156,9 @@ jobs:
           echo $JAVAFX_HOME
           echo ${{ env.JAVAFX_HOME }}
           mvn -q versions:set-property -Dproperty=javafx.version -DnewVersion=${{ env.sdk_version }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q clean compile -Dsdk=${{ env.JAVAFX_HOME }} -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
-          mvn -q javafx:run -Dsdk=${{ env.JAVAFX_HOME }} -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q versions:set-property -Dproperty=sdk -DnewVersion=${{ env.JAVAFX_HOME }} -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx/sdk-pom.xml -s settings.xml -Pcentral.manual.testing
         env:
           JAVAFX_HOME: ${{ steps.platform_win.outputs.javafx }}
           sdk_version: ${{ steps.sdk.outputs.sdk_version }}

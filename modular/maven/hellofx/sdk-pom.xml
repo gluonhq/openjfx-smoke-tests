@@ -14,7 +14,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <javafx.version>17.0.2</javafx.version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
-        <sdk>/path/to/javafx-sdk</sdk>
+        <sdk>${user.home}/javafx</sdk>
     </properties>
 
     <organization>
