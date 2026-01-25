@@ -3,7 +3,7 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      candidate:
+      do_release:
         type: boolean
         description: Release to Maven Central
         default: false
@@ -318,6 +318,7 @@ jobs:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
   maven-central-publish:
     needs: [maven-central, sdk, jmod]
+    if: ${{ github.event.inputs.do_release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
