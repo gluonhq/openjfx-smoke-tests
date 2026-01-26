@@ -8,8 +8,3 @@ runs:
       with:
         distribution: temurin
         java-version: 25.0.1
-
-    - name: Export JPACKAGE_HOME
-      shell: bash
-      run: |
-        echo "JPACKAGE_HOME=$JAVA_HOME" >> $GITHUB_ENV
