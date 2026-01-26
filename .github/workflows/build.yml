@@ -7,6 +7,10 @@ on:
         type: boolean
         description: Release to Maven Central
         default: false
+      javafx_version:
+        type: string
+        description: Java version to use for tests
+        required: true
 
 jobs:
   maven-central:
@@ -36,7 +40,7 @@ jobs:
       - name: Find javafx version
         id: version
         run: |
-          MAVEN_VERSION=`cat settings.properties | grep maven_version | cut -d'=' -f2`
+          MAVEN_VERSION=${{ github.event.inputs.javafx_version }}
           echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
         shell: bash
       - name: Test Maven (Linux)
@@ -336,4 +340,3 @@ jobs:
         env:
           maven_deployment_id: ${{ steps.deployment_id.outputs.maven_deployment_id }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
-
