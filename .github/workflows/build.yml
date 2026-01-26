@@ -127,7 +127,7 @@ jobs:
       - name: Find SDK version
         id: sdk
         run: |
-          SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
+          SDK_VERSION=${{ github.event.inputs.javafx_version }}
           echo "sdk_version=$SDK_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$SDK_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
@@ -222,7 +222,7 @@ jobs:
       - name: Find JMOD version
         id: jmod
         run: |
-          JMOD_VERSION=`cat settings.properties | grep jmod_version | cut -d'=' -f2`
+          JMOD_VERSION=${{ github.event.inputs.javafx_version }}
           echo "jmod_version=$JMOD_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$JMOD_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
