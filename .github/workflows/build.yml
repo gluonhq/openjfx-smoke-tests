@@ -3,14 +3,14 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      do_release:
-        type: boolean
-        description: Release to Maven Central
-        default: false
       javafx_version:
         type: string
         description: Java version to use for tests
         required: true
+      do_release:
+        type: boolean
+        description: Release to Maven Central
+        default: false
 
 jobs:
   maven-central:
