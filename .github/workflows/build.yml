@@ -7,6 +7,9 @@ on:
         type: string
         description: Java version to use for tests
         required: true
+      maven_deployment_id:
+        type: string
+        description: Deployment id in central
       do_release:
         type: boolean
         description: Release to Maven Central
@@ -326,17 +329,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Find deployment id
-        id: deployment_id
-        run: |
-          MAVEN_DEPLOYMENT_ID=`cat settings.properties | grep maven_deployment_id | cut -d'=' -f2`
-          echo "maven_deployment_id=$MAVEN_DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-        shell: bash
       - name: Publish Deployment
         run: |
           curl --request POST \
             --header "Authorization: Bearer ${{ env.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}" \
             "https://central.sonatype.com/api/v1/publisher/deployment/${{ env.maven_deployment_id }}"
         env:
-          maven_deployment_id: ${{ steps.deployment_id.outputs.maven_deployment_id }}
+          maven_deployment_id: ${{ github.event.inputs.maven_deployment_id }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
