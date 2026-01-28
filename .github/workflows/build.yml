@@ -15,7 +15,7 @@ on:
         description: Release to Maven Central
         default: false
 
-run-name: JavaFX - ${{ inputs.javafx_version }} & Release - ${{ inputs.do_release }}
+run-name: JavaFX ${{ inputs.javafx_version }} & Release ${{ inputs.do_release }}
 
 jobs:
   maven-central:
