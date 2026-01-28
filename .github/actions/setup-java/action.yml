@@ -1,0 +1,10 @@
+name: Setup Java
+description: Install and configure Java
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: 25.0.1
