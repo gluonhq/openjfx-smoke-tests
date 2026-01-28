@@ -63,9 +63,9 @@ jobs:
       - name: Test Maven (Windows)
         if: runner.os == 'windows'
         run: |
-          mvn -q versions:set-property -Dproperty='javafx.version' -DnewVersion='${{ env.maven_version }}' -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral"
-          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral"
-          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml "-Pcentral"
+          mvn -q versions:set-property -Dproperty='javafx.version' -DnewVersion='${{ env.maven_version }}' -DgenerateBackupPoms=false -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral
+          mvn -q clean compile -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral
+          mvn -q javafx:run -f ${{ matrix.type }}/maven/hellofx -s settings.xml -Pcentral
         env:
           maven_version: ${{ steps.version.outputs.maven_version }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
