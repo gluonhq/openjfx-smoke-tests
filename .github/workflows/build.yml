@@ -1,8 +1,19 @@
 name: Build
 
 on:
-  push:
-    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      javafx_version:
+        type: string
+        description: Java version to use for tests
+        required: true
+      maven_deployment_id:
+        type: string
+        description: Deployment id in central
+      do_release:
+        type: boolean
+        description: Release to Maven Central
+        default: false
 
 jobs:
   maven-central:
@@ -28,7 +39,7 @@ jobs:
       - name: Find javafx version
         id: version
         run: |
-          MAVEN_VERSION=`cat settings.properties | grep maven_version | cut -d'=' -f2`
+          MAVEN_VERSION=${{ github.event.inputs.javafx_version }}
           echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
         shell: bash
       - name: Test Maven (Linux)
@@ -111,7 +122,7 @@ jobs:
       - name: Find SDK version
         id: sdk
         run: |
-          SDK_VERSION=`cat settings.properties | grep sdk_version | cut -d'=' -f2`
+          SDK_VERSION=${{ github.event.inputs.javafx_version }}
           echo "sdk_version=$SDK_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$SDK_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
@@ -202,7 +213,7 @@ jobs:
       - name: Find JMOD version
         id: jmod
         run: |
-          JMOD_VERSION=`cat settings.properties | grep jmod_version | cut -d'=' -f2`
+          JMOD_VERSION=${{ github.event.inputs.javafx_version }}
           echo "jmod_version=$JMOD_VERSION" >> $GITHUB_OUTPUT
           VERSIONPATH=$JMOD_VERSION
           if [[ "$VERSIONPATH" == *"ea"* ]]; then
@@ -302,21 +313,15 @@ jobs:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
   maven-central-publish:
     needs: [maven-central, sdk, jmod]
+    if: ${{ github.event.inputs.do_release }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Find deployment id
-        id: deployment_id
-        run: |
-          MAVEN_DEPLOYMENT_ID=`cat settings.properties | grep maven_deployment_id | cut -d'=' -f2`
-          echo "maven_deployment_id=$MAVEN_DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-        shell: bash
       - name: Publish Deployment
         run: |
           curl --request POST \
             --header "Authorization: Bearer ${{ env.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}" \
             "https://central.sonatype.com/api/v1/publisher/deployment/${{ env.maven_deployment_id }}"
         env:
-          maven_deployment_id: ${{ steps.deployment_id.outputs.maven_deployment_id }}
+          maven_deployment_id: ${{ github.event.inputs.maven_deployment_id }}
           MAVEN_CENTRAL_PORTAL_BEARER_TOKEN: ${{ secrets.MAVEN_CENTRAL_PORTAL_BEARER_TOKEN }}
-
