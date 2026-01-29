@@ -1,11 +1,13 @@
 # openjfx-smoke-tests
 
 Tests to run against OpenJFX SDK, JMODS and Maven artifacts.
-The deployment with the specified id in settings.properties will be published automatically when all tests pass.
+
+The deployment with the specified id as workflow input will be published automatically when all tests pass.
 
 To start a new test:
-- edit `settings.properties` 
-- update the versions you want to test
-- change `maven_deployment_id` to the deployment id that needs to be published after running the tests
+- Go to https://github.com/gluonhq/openjfx-smoke-tests/actions/workflows/build.yml
+- Click on 'Run workflow'
+- Provide the JavaFX version to run the tests against
+- Provide `maven_deployment_id` if artifacts needs to be published after running the tests
 
-Then commit and push to trigger the actions workflow. 
+Then run workflow.
