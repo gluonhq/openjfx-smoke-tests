@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: sunday
+  - package-ecosystem: "gradle"
+    directories:
+      - "modular/gradle/hellofx"
+      - "non-modular/gradle/hellofx"
+    schedule:
+      interval: weekly
+      day: sunday
+  - package-ecosystem: "maven"
+    directories:
+      - "modular/maven/hellofx"
+      - "non-modular/maven/hellofx"
+    schedule:
+      interval: weekly
+      day: sunday
