@@ -2,7 +2,7 @@
 
 Tests to run against OpenJFX SDK, JMODS and Maven artifacts.
 
-The deployment with the specified id as workflow i/p will be published automatically when all tests pass.
+The deployment with the specified id as workflow input will be published automatically when all tests pass.
 
 To start a new test:
 - Go to https://github.com/gluonhq/openjfx-smoke-tests/actions/workflows/build.yml
