@@ -290,7 +290,9 @@ jobs:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
   maven-central-publish:
     needs: [maven-central, sdk, jmod]
-    if: ${{ github.event.inputs.do_release }}
+    if: >
+      ${{ github.event.inputs.do_release == 'true'
+        && github.event.inputs.maven_deployment_id != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
