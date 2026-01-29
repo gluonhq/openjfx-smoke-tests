@@ -10,12 +10,8 @@ on:
       maven_deployment_id:
         type: string
         description: Deployment id in central
-      do_release:
-        type: boolean
-        description: Release to Maven Central
-        default: false
 
-run-name: JavaFX ${{ inputs.javafx_version }} & Release is ${{ inputs.do_release }}
+run-name: JavaFX ${{ inputs.javafx_version }} & Release is ${{ inputs.maven_deployment_id != '' }}
 
 jobs:
   maven-central:
@@ -290,9 +286,7 @@ jobs:
           jmod_version: ${{ steps.jmod.outputs.jmod_version }}
   maven-central-publish:
     needs: [maven-central, sdk, jmod]
-    if: >
-      ${{ github.event.inputs.do_release == 'true'
-        && github.event.inputs.maven_deployment_id != '' }}
+    if: github.event.inputs.maven_deployment_id != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
