@@ -5,11 +5,11 @@ on:
     inputs:
       javafx_version:
         type: string
-        description: Java version to use for tests
+        description: JavaFX version to test (i.e. 26-ea+23, 25.0.2)
         required: true
       maven_deployment_id:
         type: string
-        description: Deployment id in central
+        description: Deployment ID for maven publication to sonatype central
 
 run-name: JavaFX ${{ inputs.javafx_version }} & Release is ${{ inputs.maven_deployment_id != '' }}
 
