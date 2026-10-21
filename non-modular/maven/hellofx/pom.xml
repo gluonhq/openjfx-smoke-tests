@@ -15,6 +15,13 @@
   </properties>
 
   <name>hellofx</name>
+
+  <repositories>
+    <repository>
+      <id>gluon-ea-repo</id>
+      <url>https://maven.gluonhq.com/nexus/content/repositories/releases</url>
+    </repository>
+  </repositories>
   
   <dependencies>
     <dependency>
